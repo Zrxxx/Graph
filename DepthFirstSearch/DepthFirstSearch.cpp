@@ -36,8 +36,8 @@ void DFS(int i) {
 	}
 }
 void depthFirstSearch() {
-	int first = zeronumCheck();
-	num[first] = t++;
+	int first = zeronumCheck();	//返回第一个一个未访问过的顶点
+	num[first] = t++;		//标记该点为已访问
 	while (first != -1)
 	{
 		for (int i = 0; i < msize; ++i) {
