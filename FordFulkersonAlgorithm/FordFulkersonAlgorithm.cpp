@@ -5,10 +5,11 @@
 FordFulkerson算法流程：
 	每条边e需要记录容量值 c(e) ,当前边流向的流量 f(e) , 残存量 c(e)-f(e),当前边的反向的流量 f'(e), f'(e) = f(e)  根据残存图的定义
 	每个点u需要做标记：  如果该点作为前向边v->u的终点，其标记值为 min( c(vu)-f(vu), label(v))，
-						 如果该点作为后向边 v->u的终点，其标记值为 min( f(vu), label(v))。    每次都是选最小值（最小割）标记，将标记值传递到汇点
+			 如果该点作为后向边 v->u的终点，其标记值为 min( f(vu), label(v))。    每次都是选最小值（最小割）标记，将标记值传递到汇点
 
-	标记源点s为（null,ifinity），并将源点放入已检查集合，只要已检查的集合labeled[]不为空，将源点拿出，对该集合中一点的邻接点中未访问过的点设置标记、设置
-	为已检查，并进行类似深度优先遍历，当遍历到汇点t时即表示找到一条增广路，从t的标记残留值开始将每条边的流量进行增加，并将labeled[]中重置为只有源点s,
+	标记源点s为（null,ifinity），并将源点放入已检查集合，只要已检查的集合labeled[]不为空，将源点拿出，
+	对该集合中一点的邻接点中未访问过的点设置标记、设置为已检查，并进行类似深度优先遍历，
+	当遍历到汇点t时即表示找到一条增广路，从t的标记残留值开始将每条边的流量进行增加，并将labeled[]中重置为只有源点s,
 	当遍历结果不能到t，则找到最大路最小割。
 */
 #include "pch.h"
@@ -38,21 +39,21 @@ struct node {
 };
 
 int adjmatrix[msize][msize] = { {0,16,13,0,0,0},		//存储边容量信息
-								{0,0,0,12,0,0},
-								{0,4,0,0,14,0},
-								{0,0,9,0,0,20},
-								{0,0,0,7,0,4},
-								{0,0,0,0,0,0} };
+				{0,0,0,12,0,0},
+				{0,4,0,0,14,0},
+				{0,0,9,0,0,20},
+				{0,0,0,7,0,4},
+				{0,0,0,0,0,0} };
 
 int flow[msize][msize]{ {0,0,0,0,0,0},				//各边的起始流量
-						{0,0,0,0,0,0},
-						{0,0,0,0,0,0},
-						{0,0,0,0,0,0},
-						{0,0,0,0,0,0},
-						{0,0,0,0,0,0}};					
-node label[msize];						//存储结点的标记
-bool labeledChecked[msize] = {0,0,0,0,0,0};					//记录该顶点是否已经标记，书中已标记的顶点用栈结果push存入，但使用栈存入无法判断邻接顶点是否已经检查
-vector<int> labeled[msize];
+			{0,0,0,0,0,0},
+			{0,0,0,0,0,0},
+			{0,0,0,0,0,0},
+			{0,0,0,0,0,0},
+			{0,0,0,0,0,0}};					
+node label[msize];			//存储结点的标记
+bool labeledChecked[msize] = {0,0,0,0,0,0};//记录该顶点是否已经标记，书中已标记的顶点用栈结果push存入，但使用栈存入无法判断邻接顶点是否已经检查
+vector<int> labeled[msize];		//便于检验
 bool isempty() {
 	for (int i = 0; i < msize; ++i) {
 		if (labeledChecked[msize] != 0) {
@@ -120,7 +121,7 @@ void augmentPath(int t) {
 }
 
 void FordFulkersonAlgorithm() {
-	label[0].pre = -1;				//源点没有父节点，设置为-1
+	label[0].pre = -1;			//源点没有父节点，设置为-1
 	label[0].slack = infinity;		//源点的残余量为无穷大
 	labeledChecked[0] = 1;			//源点设置为已检查
 	labeled->push_back(0);
@@ -136,16 +137,15 @@ void FordFulkersonAlgorithm() {
 			{
 				//访问顶点s的所有未访问邻接顶点
 				std::cout << "进入未标记的临界点循环，正在处理结点： "<<j << std::endl;			//测试
-				
 				if (isforwardedge(i,j) && adjmatrix[i][j] - flow[i][j] > 0) { //当flow(i,j)=cap(i,j)时不进行标记
 					label[j].pre = i;
 					label[j].slack = slack(i, j);
-					std::cout << "（正向边）更新结点 " << j << "  slack为：" << label[j].slack << std::endl;
+					std::cout << "（正向边）更新结点 " << j << "  slack为：" << label[j].slack << std::endl;//测试
 				}
 				else if(!isforwardedge(i,j)){
 					label[j].pre = i;
 					label[j].slack = slack(i, j);
-					std::cout << "（反向边）更新结点 " << j << "  slack为：" << label[j].slack << std::endl;
+					std::cout << "（反向边）更新结点 " << j << "  slack为：" << label[j].slack << std::endl;//测试
 				}
 				if (end == j) {
 						augmentPath(j);
@@ -242,8 +242,8 @@ int main() {
 开始遍历
 进入未标记的临界点循环，正在处理结点： 4
 （正向边）更新结点 4  slack为：2				（4被删除，4已无其它路径可走）
-开始遍历										(1已被访问，2被删除)
-开始遍历										（vector中剩1）
+开始遍历							(1已被访问，2被删除)
+开始遍历							（vector中剩1）
 进入未标记的临界点循环，正在处理结点： 3
 （正向边）更新结点 3  slack为：12
 开始遍历
